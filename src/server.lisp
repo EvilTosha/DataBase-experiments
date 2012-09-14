@@ -15,7 +15,7 @@
 ;; define handling for ajax queries to databse (url /query)
 (hunchentoot:define-easy-handler (query :uri "/query" :default-request-type :get) (command)
 	;; (setf (hunchentoot:content-type*) "text/plain")
-	(let* ((tokens (split-query-to-tokens (url-decode command)))
+	(let* ((tokens (split-query-to-tokens command))
 				 (action (car tokens))
 				 (args (cdr tokens))
 				 (key (car args)))

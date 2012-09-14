@@ -65,7 +65,7 @@
           if (the_shell_command) {
             this.commands_history[this.commands_history.length] = the_shell_command;
             this.history_pointer = this.commands_history.length;
-            the_url = 'query?command=' + escape(the_shell_command);
+            the_url = 'query?command=' + encodeURIComponent(the_shell_command);
             makeHttpRequest(the_url, Console.printResult);
           }
           break;
