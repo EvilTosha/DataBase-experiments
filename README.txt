@@ -2,7 +2,7 @@
 1) устанавливаем SBCL и screen:
 	 sudo aptitude install sbcl screen
 2) Запускаем сервер:
-	 sudo ./run.sh
+	 sudo sh run.sh
 3) Идем на сервер:
 	 В браузере http://localhost:8080
 4) Для завершения:
