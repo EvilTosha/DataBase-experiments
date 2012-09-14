@@ -2,8 +2,9 @@
 .console {
     margin: 0px;
     font-family: courier;
-    color: gray;
+    color: green;
     background-color: black;
+		font-weight: 700;
 }
 #result {
     overflow: auto;
