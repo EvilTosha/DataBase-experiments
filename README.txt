@@ -1,6 +1,6 @@
 Инструкции по запуску:
-1) устанавливаем SBCL и screen:
-	 sudo aptitude install sbcl screen
+1) устанавливаем SBCL, screen:
+	 sudo apt-get install sbcl screen
 2) Запускаем сервер:
 	 sudo sh run.sh
 3) Идем на сервер:
