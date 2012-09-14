@@ -1,6 +1,6 @@
 Инструкции по запуску:
 1) устанавливаем SBCL, screen:
-	 sudo apt-get install sbcl screen
+	 sudo apt-get install sbcl screen libssl1.0.0
 2) Запускаем сервер:
 	 sudo sh run.sh
 3) Идем на сервер:
