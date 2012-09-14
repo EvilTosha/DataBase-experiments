@@ -9,3 +9,6 @@
 ;; load database source code
 (push #P"./" asdf:*central-registry*)
 (asdf:load-system :database)
+
+;; load database contents
+(database:db-load)

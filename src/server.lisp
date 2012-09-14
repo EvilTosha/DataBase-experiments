@@ -19,17 +19,27 @@
 				 (action (car tokens))
 				 (args (cdr tokens))
 				 (key (car args)))
-		;; check number of args
-		(if (not key)
-				"Error: key must be specified"
-				;; else
-				(cond
-					((string= "help" action) (help-message))
-					((string= "create" action) (apply #'db-create args))
-					((string= "get" action) (db-retrieve key))
-					((string= "update" action) (apply #'db-update args))
-					((string= "remove" action) (db-delete key))
-					(t "Unknown command, try to type 'help'")))))
+		(cond
+			((string= "help" action) (help-message))
+			((string= "create" action)
+			 (if (not key)
+					 "Error: key must be specified"
+					 (apply #'db-create args)))
+			((string= "get" action)
+			 (if (not key)
+					 "Error: key must be specified"
+					 (print-entry (db-retrieve key))))
+			((string= "update" action)
+			 (if (not key)
+					 "Error: key must be specified"
+					 (apply #'db-update args)))
+			((string= "remove" action)
+			 (if (not key)
+					 "Error: key must be specified"
+					 (db-delete key)))
+			((string= "flush" action)
+			 (db-flush))
+			(t "Unknown command, try to type 'help'"))))
 
 
 (defun help-message ()
@@ -40,6 +50,5 @@ get KEY - retrieve entry with specified KEY;
 update KEY [NAME] [PHONE] - update enry information;
 remove KEY - remove entry with specified key from database;
 flush - save current database state to disk;
-halt - stop database (all non-saved information will be lost!).
 
 Remember - if you specify more args than needed, all extra args will be ignored")

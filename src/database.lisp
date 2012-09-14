@@ -9,6 +9,18 @@
 	 (phone :initform "" :initarg :phone :accessor phone))
 	(:documentation "Simple entry for database; includes 2 fields - name and phone"))
 
+(defun print-entry (entry)
+	"Return text represtntation (human-readable) of database entry"
+	;; if entry is string, it's error message
+	(if (stringp entry)
+			entry
+			;; else, print entry
+			(format nil "Name: ~A; Phone: ~A;"
+							(name entry) (phone entry))))
+
+(defmethod json:encode ((object db-entry) &optional stream)
+	(json:encode-plist (list :name (name object) :phone (phone object)) stream))
+
 (defvar *database* (make-hash-table :test #'equal)
 	"Dynamic (global) variable for storing database entries. Inner structure - hash-table")
 
@@ -75,5 +87,22 @@
 	(with-open-file (file #P"data/snapshot.db"
 												:direction :output :if-exists :supersede
 												:if-does-not-exist :create)
-		))
+		(json:encode *database* file))
+	;; return
+	"Successfully saved data")
+
+(defun db-load (&optional (pathname #P"data/snapshot.db"))
+	"Restores saved database stage. Warning: all current data will be overwritten!"
+	(declare (pathname pathname))
+	(with-open-file (file pathname
+												:direction :input :if-does-not-exist nil)
+		(let ((database-temp (json:parse (read-line file))))
+			;; FIXME: database shouldn't reset here
+			(setf *database* (make-hash-table :test #'equal))
+			(maphash #'(lambda (key value)
+									 (setf (gethash key *database*)
+												 (make-instance 'db-entry
+																				:name (gethash "NAME" value)
+																				:phone (gethash "PHONE" value))))
+							 database-temp))))
 
