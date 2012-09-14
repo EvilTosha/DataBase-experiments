@@ -24,6 +24,15 @@
 (defvar *database* (make-hash-table :test #'equal)
 	"Dynamic (global) variable for storing database entries. Inner structure - hash-table")
 
+(defun error-message (symbol &rest args)
+  "Convert error symbol to corresponding error message (using args)"
+  (case symbol
+    (key-not-specified "Error: key must be specified")
+    (unknown-command "Error: unknown command, try to type 'help'")
+    (existing-entry (apply #'format nil "Error: entry ~#[~;with key ~A ~]already exists" args))
+    (no-entry-presented (apply #'format nil
+                               "Error: ~#[no such entry~;entry with key ~A wasn't found~] in database" args))))
+
 ;;; CRUD operations
 
 (defun db-create (key &optional (name "") (phone ""))
@@ -31,7 +40,7 @@
 	(declare (string key name phone))
 	(if (gethash key *database*)
 			;; return error "Entry already exists"
-			"Error: entry already exists"
+			(error-message 'existing-entry key)
 			;; else
 			(progn
 				;; initialize and store new entry
@@ -48,7 +57,7 @@
 		(if entry
 				entry
 				;; else return error
-				(format nil "Error: entry with key ~A wasn't found in database" key))))
+				(error-message 'no-entry-presented key))))
 
 
 (defun db-update (key &optional (name "") (phone ""))
@@ -64,7 +73,7 @@
 					;; return sucess message
 					(format nil "Entry with key ~A successfully updated with new data!" key))
 				;; else return error
-				(format nil "Error: entry with key ~A wasn't found in database" key))))
+				(error-message 'no-entry-presented key))))
 
 (defun db-delete (key)
 	"Removes single entry from database by key"
@@ -78,7 +87,7 @@
 					;; no need to remove object, garbage-collector will do it
 					(format nil "Entry with key ~A was removed from storage" key))
 				;; else return error
-				(format nil "Error: entry with key ~A wasn't found in database" key))))
+				(error-message 'no-entry-presented key))))
 
 
 (defun db-flush ()

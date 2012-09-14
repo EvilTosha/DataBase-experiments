@@ -23,24 +23,23 @@
 			((string= "help" action) (help-message))
 			((string= "create" action)
 			 (if (not key)
-					 "Error: key must be specified"
+					 (error-message 'key-not-specified)
 					 (apply #'db-create args)))
 			((string= "get" action)
 			 (if (not key)
-					 "Error: key must be specified"
+					 (error-message 'key-not-specified)
 					 (print-entry (db-retrieve key))))
 			((string= "update" action)
 			 (if (not key)
-					 "Error: key must be specified"
+					 (error-message 'key-not-specified)
 					 (apply #'db-update args)))
 			((string= "remove" action)
 			 (if (not key)
-					 "Error: key must be specified"
+					 (error-message 'key-not-specified)
 					 (db-delete key)))
 			((string= "flush" action)
 			 (db-flush))
-			(t "Unknown command, try to type 'help'"))))
-
+			(t (error-message 'unknown-command)))))
 
 (defun help-message ()
 	"Available commands:
