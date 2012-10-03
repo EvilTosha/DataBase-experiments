@@ -1,6 +1,6 @@
 ;;;; database.lisp
 
-;;;; Simple database implemenatation (operations: load, CRUD, flush, halt)
+;;;; Simple database implemenatation (operations: load, CRUD, flush)
 
 (in-package :database)
 
@@ -89,6 +89,7 @@
         ;; else return error
         (error-message 'no-entry-presented key))))
 
+;;;; server-state operations (flush, load)
 
 (defun db-flush ()
   "Saves current database state to disk"

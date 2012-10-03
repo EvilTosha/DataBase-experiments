@@ -10,5 +10,5 @@
 (push #P"./" asdf:*central-registry*)
 (asdf:load-system :database)
 
-;; load database contents
+;; load database data
 (database:db-load)

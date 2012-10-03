@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function usage
+{
+    echo "usage: start-db [[-d] | [-h]]"
+}
+
+dev=
+
+for var in "$@"
+do
+    case "$var" in
+        -d | --dev )            dev=1
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+done
+
+
+if  [ "$dev" = "1" ]; then
+    screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load dev-start.lisp
+else
+    screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load start.lisp
+fi
