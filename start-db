@@ -2,27 +2,44 @@
 
 function usage
 {
-    echo "usage: start-db [[-d] | [-h]]"
+    echo "Usage: start-db [options] <action> ..."
+    echo "Actions:"
 }
 
 dev=
+action=
+servername=
+swankport=
 
-for var in "$@"
-do
-    case "$var" in
+
+while [ "$1" != "" ]; do
+    case $1 in
         -d | --dev )            dev=1
                                 ;;
-        -h | --help )           usage
+        --help )                usage
                                 exit
+                                ;;
+        --swank-port )          shift
+                                swankport=$1
+                                ;;
+        start-shard )           action="start-shard"
+                                shift
+                                servername=$1
+                                ;;
+        start-router )          action="start-router"
+                                shift
+                                servername=$1
                                 ;;
         * )                     usage
                                 exit 1
     esac
+    shift
 done
 
+# needed for doing correct action inside lisp
+export dev
+export action
+export servername
+export swankport
 
-if  [ "$dev" = "1" ]; then
-    screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load dev-start.lisp
-else
-    screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load start.lisp
-fi
+screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load start.lisp

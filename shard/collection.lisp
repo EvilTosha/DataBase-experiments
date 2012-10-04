@@ -2,7 +2,7 @@
 
 ;;;; Simple database implemenatation (operations: load, CRUD, flush)
 
-(in-package :database)
+(in-package :shard)
 
 (defclass db-entry ()
   ((name  :initform "" :initarg :name  :accessor name)
@@ -115,4 +115,3 @@
                                         :name (gethash "NAME" value)
                                         :phone (gethash "PHONE" value))))
                database-temp))))
-

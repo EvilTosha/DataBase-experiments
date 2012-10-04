@@ -1,0 +1,25 @@
+{
+  "router" : { "addr"        : "http://localhost:8200/",
+               "server-port" : "8200"
+             },
+  "shard01": {
+    "master" : { "addr"        : "http://localhost:8201/",
+                 "path"        : "data/master01.db",
+                 "server-port" : "8201"
+               },
+    "slave"  : { "addr"        : "http://localhost:8202/",
+                 "path"        : "data/slave01.db",
+                 "server-port" : "8202"
+               }
+  },
+  "shard01": {
+    "master" : { "addr"        : "http://localhost:8301/",
+                 "path"        : "data/master02.db",
+                 "server-port" : "8301"
+               },
+    "slave"  : { "addr"        : "http://localhost:8302/",
+                 "path"        : "data/slave02.db",
+                 "server-port" : "8302"
+               }
+  },
+}

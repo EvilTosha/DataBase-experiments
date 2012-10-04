@@ -2,7 +2,7 @@
 
 ;;;; Simple parser for queries to database
 
-(in-package :database)
+(in-package :router)
 
 (defun split-query-to-tokens (query)
   "Splits given query (which should be string) to tokens by spaces"
