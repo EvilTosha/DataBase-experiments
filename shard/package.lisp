@@ -2,4 +2,4 @@
 
 (defpackage :shard
   (:use :cl :hunchentoot :cl-fad :split-sequence :yason #:trivial-http)
-  (:export #:db-load #:config-load))
+  (:export #:db-load #:config-load #:start-server))

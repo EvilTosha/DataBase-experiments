@@ -5,13 +5,24 @@
 
 (in-package :router)
 
+(defclass server-info ()
+  ((name         :initarg :name         :initform ""                    :accessor name)
+   (port         :initarg :port         :initform 0                     :accessor port)
+   (type         :initarg :type         :initform "router")
+   (start-time   :initarg :start-time   :initform (get-universal-time)  :accessor start-time)))
+
+(defvar *server-info* (make-instance 'server-info))
+
 (defun start-server (server-name &key dev)
   (declare (string server-name))
+  ;; complete server-info
+  (setf (name *server-info*) server-name
+        (port *server-info*) (config-get-server-option server-name "server-port"))
   ;; start hunchentoot server
   ;; just serving static pages in www/ directory
   (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
                                     :document-root #P"router/www/"
-                                    :port (config-get-my-option "server-port")))
+                                    :port (port *server-info*)))
   ;; define handling for ajax queries to databse (url /query)
   (hunchentoot:define-easy-handler (query :uri "/query" :default-request-type :get) (command)
     (let* ((tokens (split-query-to-tokens command))

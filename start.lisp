@@ -7,6 +7,9 @@
   "Specifies which action should accomplish start script (start-shard, start-router, etc)")
 (defparameter *server-name* (sb-unix::posix-getenv "servername")
   "Specifies server name, which is used as name of screen, and also used for searching options in config file")
+(defparameter *master-p* (when (sb-unix::posix-getenv "masterspecifier")
+                           (string= "master" (sb-unix::posix-getenv "masterspecifier")))
+  "Must be \"master\" or \"slave\" (used only for shard). Specifies whether master or slave part of shard should be started.")
 (defparameter *swank-port* (parse-integer (sb-unix::posix-getenv "swankport"))
   "Specifies port to start swank on, if dev flag specified; if no port given, use 4005")
 
@@ -29,9 +32,6 @@
 (when (and *dev-server-p* *swank-port*
   (swank:create-server :port *swank-port* :dont-close t)))
 
-;; load hunchentoot the webserver
-(asdf:load-system :hunchentoot)
-
 (push #P"./" asdf:*central-registry*)
 
 ;; load specified system
@@ -42,17 +42,22 @@
    (asdf:load-system :shard))
   (t (error "Unknown action ~A" *db-action*)))
 
-(defun start-server (package)
-  (funcall (intern (symbol-name 'config-load) package))
-  (funcall (intern (symbol-name 'start-server) package)
-           *server-name* :dev *dev-server-p*))
+;; load hunchentoot the webserver
+(asdf:load-system :hunchentoot)
 
 ;; accomplish on-start tasks
 (cond
   ((string= "start-router" *db-action*)
-   (start-server (find-package :router)))
+   (let ((package (find-package :router)))
+     (funcall (intern (symbol-name 'config-load) package))
+     (funcall (intern (symbol-name 'start-server) package)
+              *server-name* :dev *dev-server-p*)))
   ((string= "start-shard" *db-action*)
    (let ((package (find-package :shard)))
-     (start-server package)
+     (funcall (intern (symbol-name 'config-load) package))
+     (funcall (intern (symbol-name 'start-server) package)
+              *server-name* *master-p* :dev *dev-server-p*)
      (funcall (intern (symbol-name 'db-load) package))))
   (t (error "Unknown action ~A" *db-action*)))
+
+(print *master-p*)

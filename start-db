@@ -9,6 +9,7 @@ function usage
 dev=
 action=
 servername=
+masterspecifier=
 swankport=
 
 
@@ -25,6 +26,8 @@ while [ "$1" != "" ]; do
         start-shard )           action="start-shard"
                                 shift
                                 servername=$1
+                                shift
+                                masterspecifier=$1
                                 ;;
         start-router )          action="start-router"
                                 shift
@@ -40,6 +43,7 @@ done
 export dev
 export action
 export servername
+export masterspecifier
 export swankport
 
 screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load start.lisp
