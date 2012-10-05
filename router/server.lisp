@@ -6,7 +6,7 @@
 (in-package :router)
 
 (defun start-server (server-name &key dev)
-  (declare (string server-name) (boolean dev))
+  (declare (string server-name))
   ;; start hunchentoot server
   ;; just serving static pages in www/ directory
   (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor

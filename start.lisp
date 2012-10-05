@@ -7,7 +7,7 @@
   "Specifies which action should accomplish start script (start-shard, start-router, etc)")
 (defparameter *server-name* (sb-unix::posix-getenv "servername")
   "Specifies server name, which is used as name of screen, and also used for searching options in config file")
-(defparameter *swank-port* (sb-unix::posix-getenv "swankport")
+(defparameter *swank-port* (parse-integer (sb-unix::posix-getenv "swankport"))
   "Specifies port to start swank on, if dev flag specified; if no port given, use 4005")
 
 ;; loaading all required libs
@@ -27,7 +27,7 @@
 
 ;; start swank
 (when (and *dev-server-p* *swank-port*
-  (swank:create-server :port (parse-integer *swank-port*) :dont-close t)))
+  (swank:create-server :port *swank-port* :dont-close t)))
 
 ;; load hunchentoot the webserver
 (asdf:load-system :hunchentoot)
@@ -42,15 +42,17 @@
    (asdf:load-system :shard))
   (t (error "Unknown action ~A" *db-action*)))
 
+(defun start-server (package)
+  (funcall (intern (symbol-name 'config-load) package))
+  (funcall (intern (symbol-name 'start-server) package)
+           *server-name* :dev *dev-server-p*))
+
 ;; accomplish on-start tasks
 (cond
   ((string= "start-router" *db-action*)
-   ;; FIXME: specify path to config
-   (router:config-load)
-   (router:start-server *server-name* :dev *dev-server-p*))
+   (start-server (find-package :router)))
   ((string= "start-shard" *db-action*)
-   ;; FIXME: specify path to config
-   (shard:config-load)
-   (shard:start-server *server-name* :dev *dev-server-p*)
-   (shard:db-load))
+   (let ((package (find-package :shard)))
+     (start-server package)
+     (funcall (intern (symbol-name 'db-load) package))))
   (t (error "Unknown action ~A" *db-action*)))
