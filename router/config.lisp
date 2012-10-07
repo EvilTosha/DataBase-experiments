@@ -35,3 +35,13 @@ If no such server (or server part) or option found, signals error"
 Note: for correct work, *server-info* variable should be correctly set up"
   (declare (string option))
   (config-get-server-option (name *server-info*) option))
+
+(defun config-get-buckets ()
+  "Computes plist of bucket ends and associated server names."
+  (let (res)
+    (maphash #'(lambda (server-name params)
+                 ;; FIXME: Maybe add some option to distinct router from shards?
+                 (when (string/= "router" server-name)
+                   (setf (getf res (gethash "bucket-end" params)) server-name)))
+             *config*)
+    res))

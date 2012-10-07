@@ -7,7 +7,7 @@
 							 :cl-fad
 							 :split-sequence
 							 :yason
-               #:trivial-http)
+               :drakma)
 	:components
   ((:module "shard"
             :components

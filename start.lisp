@@ -10,7 +10,9 @@
 (defparameter *master-p* (when (sb-unix::posix-getenv "masterspecifier")
                            (string= "master" (sb-unix::posix-getenv "masterspecifier")))
   "Must be \"master\" or \"slave\" (used only for shard). Specifies whether master or slave part of shard should be started.")
-(defparameter *swank-port* (parse-integer (sb-unix::posix-getenv "swankport"))
+(defparameter *swank-port* (let ((port-str (sb-unix::posix-getenv "swankport")))
+                             (when (and port-str (string/= port-str ""))
+                               (parse-integer (sb-unix::posix-getenv "swankport"))))
   "Specifies port to start swank on, if dev flag specified; if no port given, use 4005")
 
 ;; loaading all required libs
@@ -29,8 +31,8 @@
   (asdf:load-system :swank))
 
 ;; start swank
-(when (and *dev-server-p* *swank-port*
-  (swank:create-server :port *swank-port* :dont-close t)))
+(when (and *dev-server-p* *swank-port*)
+  (swank:create-server :port *swank-port* :dont-close t))
 
 (push #P"./" asdf:*central-registry*)
 
@@ -59,5 +61,3 @@
               *server-name* *master-p* :dev *dev-server-p*)
      (funcall (intern (symbol-name 'db-load) package))))
   (t (error "Unknown action ~A" *db-action*)))
-
-(print *master-p*)

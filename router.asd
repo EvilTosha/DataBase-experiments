@@ -5,11 +5,12 @@
 							 :cl-fad
 							 :split-sequence
 							 :yason
-               #:trivial-http)
+               :drakma)
 	:components
   ((:module "router"
             :components
             ((:file "package")
              (:file "config" :depends-on ("package"))
              (:file "parser" :depends-on ("package"))
-						 (:file "server" :depends-on ("parser" "config"))))))
+             (:file "route"  :depends-on ("package" "config"))
+						 (:file "server" :depends-on ("parser" "config" "route"))))))
