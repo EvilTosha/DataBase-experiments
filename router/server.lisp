@@ -17,7 +17,9 @@
   (declare (string server-name))
   ;; complete server-info
   (setf (name *server-info*) server-name
-        (port *server-info*) (config-get-server-option server-name "server-port"))
+        (port *server-info*) (config-get-server-option server-name "server-port")
+        ;; init buckets list for hashing
+        *bucket-ends* (config-get-buckets))
   ;; start hunchentoot server
   ;; just serving static pages in www/ directory
   (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor

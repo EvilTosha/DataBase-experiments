@@ -2,8 +2,8 @@
 
 (in-package :router)
 
-(defparameter *bucket-ends* (sort (config-get-buckets) #'<)
-  "Stores plist with bucket ends as keys and server names as values. Needed for
+(defparameter *bucket-ends* nil
+  "Stores association list with bucket ends as keys and server names as values. Needed for
 \"ring\" consistent hashing")
 
 
@@ -29,7 +29,7 @@
        (if (not key)
            (error-message 'key-not-specified)
            (shard-request key (make-request-json "delete" args) t)))
-      (t (error-message 'unknown-command))))
+      (t (error-message 'unknown-command)))))
 
 (defun make-request-json (command args)
   "Creates JSON representation of request to shard"
@@ -37,16 +37,21 @@
   (with-output-to-string (*standard-output*)
     (json:encode-plist (list :command command :args args))))
 
-(defun get-shard-by-key (key)
+(defun bucket-upper-bound (&optional (buckets *bucket-ends*))
+  "Finds maximal value of bucket end; used for hashing"
+  ;; assuming that alist contain growing values
+  (caar (last buckets)))
+
+(defun get-shard-by-hash (key)
   "Returns name of server where specified key is stored"
   (declare (string key))
   (let ((in-ring-hash
          ;; (nth-value 2 (floor a b)) is similar to (a % b) in C++
-         (nth-value 1 (floor (sxhash key) (apply #'max *bucket-ends*)))))
-    (alexandria:doplist (end server-name *bucket-ends*)
-      (when (> end in-ring-hash)
-        ;; yes, its return in lisp. But here its the easiest way to finish
-        (return server-name)))))
+         (nth-value 1 (floor (sxhash key) (bucket-upper-bound *bucket-ends*)))))
+    (loop :for (end . server-name) :in *bucket-ends*
+          :when (> end in-ring-hash)
+          ;; yes, its return in lisp. But here it's the easiest way to finish
+          :return server-name)))
 
 (defun shard-request (key request-json &optional (destructive t))
   "Make request to shard, using given request json representation.

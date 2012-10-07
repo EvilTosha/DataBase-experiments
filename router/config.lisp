@@ -37,11 +37,12 @@ Note: for correct work, *server-info* variable should be correctly set up"
   (config-get-server-option (name *server-info*) option))
 
 (defun config-get-buckets ()
-  "Computes plist of bucket ends and associated server names."
-  (let (res)
-    (maphash #'(lambda (server-name params)
-                 ;; FIXME: Maybe add some option to distinct router from shards?
-                 (when (string/= "router" server-name)
-                   (setf (getf res (gethash "bucket-end" params)) server-name)))
-             *config*)
-    res))
+  "Computes (and sorts) alist of bucket ends and associated server names."
+  (sort
+   (loop
+      :for server-name :being :the hash-key
+      :using (hash-value params) :in *config*
+      ;; FIXME: Maybe add some option to distinct router from shards?
+      :when (string/= "router" server-name)
+      :collect (cons (gethash "bucket-end" params) server-name))
+   #'< :key #'car))
