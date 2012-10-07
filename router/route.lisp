@@ -68,7 +68,7 @@ should be addressed to master"
           ;; make post request to master
           (setf result (%shard-request master-url parameters :post))
           ;; if no content received, request slave
-          ;; TODO: ask for or assign master permissions before adressing request to slave
+          ;; TODO: ask or assign master permissions before adressing request to slave
           (unless result
             (setf result (%shard-request slave-url parameters :post))))
         ;; else, non-destructive operations
@@ -93,9 +93,9 @@ should be addressed to master"
   "Renders answer from shard to text representation for user"
   (declare (string response))
   (let ((parsed-response (json:parse response :object-as :hash-table)))
-    (if (gethash "error" parsed-response)
-        (gethash "error-msg" parsed-response)
-        (gethash "data" parsed-response))))
+    (if (gethash "ERROR" parsed-response)
+        (gethash "ERROR-MSG" parsed-response)
+        (gethash "DATA" parsed-response))))
 
 (defun error-message (symbol &rest args)
   "Convert error symbol to corresponding error message (using args)"

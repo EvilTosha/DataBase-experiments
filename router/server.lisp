@@ -30,4 +30,6 @@
     (let* ((tokens (split-query-to-tokens command))
            (action (car tokens))
            (args (cdr tokens)))
-      (handle-db-request action args))))
+      ;; some magic because of huchentoot's strange behavior (dont accept multiple returned values)
+      (let ((response (handle-db-request action args)))
+        response))))
