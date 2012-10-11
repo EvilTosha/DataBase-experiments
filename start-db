@@ -46,4 +46,5 @@ export servername
 export masterspecifier
 export swankport
 
-screen -dmS database-web-console sbcl --lose-on-corruption --disable-ldb --load start.lisp
+#screen -dmS database-web-console
+sbcl --lose-on-corruption --disable-ldb --load start.lisp

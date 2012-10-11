@@ -31,5 +31,4 @@
            (action (car tokens))
            (args (cdr tokens)))
       ;; some magic because of huchentoot's strange behavior (dont accept multiple returned values)
-      (let ((response (handle-db-request action args)))
-        response))))
+      (nth-value 0 (handle-db-request action args)))))

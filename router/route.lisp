@@ -1,5 +1,8 @@
 ;;;; route.lisp
 
+;;;; File contains functions for handling requests from front end console, and
+;;;; managing connections to shards (including managing master-slave permissions)
+
 (in-package :router)
 
 (defparameter *bucket-ends* nil
@@ -31,22 +34,22 @@
            (shard-request key (make-request-json "delete" args) t)))
       (t (error-message 'unknown-command)))))
 
-(defun make-request-json (command args)
+(defun make-request-json (action args)
   "Creates JSON representation of request to shard"
-  (declare (string command) (list args))
+  (declare (string action) (list args))
   (with-output-to-string (*standard-output*)
-    (json:encode-plist (list :command command :args args))))
+    (json:encode-plist (list :action action :args args))))
 
 (defun bucket-upper-bound (&optional (buckets *bucket-ends*))
   "Finds maximal value of bucket end; used for hashing"
   ;; assuming that alist contain growing values
   (caar (last buckets)))
 
-(defun get-shard-by-hash (key)
+(defun get-shard-by-key (key)
   "Returns name of server where specified key is stored"
   (declare (string key))
   (let ((in-ring-hash
-         ;; (nth-value 2 (floor a b)) is similar to (a % b) in C++
+         ;; (nth-value 1 (floor a b)) is similar to (a % b) in C++/Java
          (nth-value 1 (floor (sxhash key) (bucket-upper-bound *bucket-ends*)))))
     (loop :for (end . server-name) :in *bucket-ends*
           :when (> end in-ring-hash)
@@ -59,10 +62,10 @@ Selects shard according to hash of key. Destructive flag determines whether comm
 should be addressed to master"
   (declare (string key request-json) (boolean destructive))
   (let* (result
-         (shard-name (get-shard-by-hash key))
+         (shard-name (get-shard-by-key key))
          (master-url (puri:merge-uris "/query" (config-get-server-option shard-name "addr" t)))
          (slave-url (puri:merge-uris "/query" (config-get-server-option shard-name "addr" nil)))
-         (parameters (list (cons "request" request-json))))
+         (parameters `(("request" . ,request-json))))
     (if destructive
         (progn
           ;; make post request to master
@@ -81,13 +84,11 @@ should be addressed to master"
 
 (defun %shard-request (url parameters &optional (method :get))
   "Do request to shard and returns received content, if some error occurs returns nil"
-  (handler-case ; handle errors during connection
-      (multiple-value-bind (content code)
-          (drakma:http-request url :method method :parameters parameters)
-        (when (equal code 200) ; OK
-          content))
-    ;; process error, assuming server down
-    (error () nil)))
+  (ignore-errors ; ignore errors during connection, assuming server's down
+    (multiple-value-bind (content code)
+        (drakma:http-request url :method method :parameters parameters)
+      (when (equal code 200) ; OK
+        content))))
 
 (defun render-shard-response (response)
   "Renders answer from shard to text representation for user"
@@ -102,7 +103,8 @@ should be addressed to master"
   (case symbol
     (key-not-specified "Error: key must be specified")
     (unknown-command "Error: unknown command, try to type 'help'")
-    (server-down "Error: server containing requested information is currently unavailable")))
+    (server-down "Error: server containing requested information is currently unavailable")
+    (t "Error: unknown error ~A" symbol)))
 
 (defun help-message ()
   "Available commands:

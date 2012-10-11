@@ -14,4 +14,5 @@
             ((:file "package")
 						 (:file "collection" :depends-on ("package"))
              (:file "config" :depends-on ("package"))
-						 (:file "server" :depends-on ("collection" "config"))))))
+             (:file "route" :depends-on ("package" "config" "collection"))
+						 (:file "server" :depends-on ("collection" "config" "route"))))))
