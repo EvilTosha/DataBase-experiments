@@ -6,11 +6,11 @@
 
 (defun create-json-response (error-flag error-msg data)
   "Forms response to router in JSON format"
-  (declare (boolean error-flag) ((or nil string) error-msg data))
+  (declare (boolean error-flag) ((or null string) error-msg data))
   (with-output-to-string (*standard-output*)
     (json:encode-plist (list :error error-flag
-                             :error-msg error-msg
-                             :data data))))
+                             :error-msg (or error-msg "")
+                             :data (or data "")))))
 
 (defun handle-db-request (action args)
   "Handle request from router, return json-encoded response"
@@ -45,5 +45,5 @@
       ;; handle occured error
       (error (e)
         (setf error-flag t
-              error-msg e)))
+              error-msg (simple-condition-format-control e))))
     (create-json-response error-flag error-msg data)))

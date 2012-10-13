@@ -24,17 +24,15 @@
   (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
                                     :port (port *server-info*)))
   ;; print simple server information at root uri
-  (hunchentoot:define-easy-handler (query :uri "/" :default-request-type :get) ()
+  (hunchentoot:define-easy-handler (main :uri "/" :default-request-type :get) ()
     (print-simple-server-info))
 
   ;; define handling for ajax queries to databse (url /query)
-  (hunchentoot:define-easy-handler (query :uri "/query") (request-json)
+  (hunchentoot:define-easy-handler (query :uri "/query") ((request-json :real-name "request"))
     (let* ((parsed-request (json:parse request-json :object-as :hash-table))
-           (command (gethash "command" parsed-request))
-           (args (gethash "args" parsed-request)))
-      (handle-db-request action args)
-    (with-output-to-string (*standard-output*)
-      (json:encode-plist (list :error nil :error-msg "Success" :data "Some data")))))
+           (action (gethash "ACTION" parsed-request))
+           (args (gethash "ARGS" parsed-request)))
+      (handle-db-request action args))))
 
 (defun print-simple-server-info ()
   (format nil "Shard server for simple database, source code: https://github.com/EvilTosha/DataBase-experiments <br />
