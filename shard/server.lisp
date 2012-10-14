@@ -29,10 +29,7 @@
 
   ;; define handling for ajax queries to databse (url /query)
   (hunchentoot:define-easy-handler (query :uri "/query") ((request-json :real-name "request"))
-    (let* ((parsed-request (json:parse request-json :object-as :hash-table))
-           (action (gethash "ACTION" parsed-request))
-           (args (gethash "ARGS" parsed-request)))
-      (handle-db-request action args))))
+    (handle-db-request request-json)))
 
 (defun print-simple-server-info ()
   (format nil "Shard server for simple database, source code: https://github.com/EvilTosha/DataBase-experiments <br />

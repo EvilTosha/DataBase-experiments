@@ -4,24 +4,28 @@
                },
     "shard01": {
         "bucket-end" : 100,
-        "master" : { "addr"        : "http://localhost:8201/",
-                     "path"        : "data/master01.db",
-                     "server-port" : 8201
+        "master" : { "addr"         : "http://localhost:8201/",
+                     "path"         : "data/master01.db",
+                     "journal-path" : "log/master01.log",
+                     "server-port"  : 8201
                    },
-        "slave"  : { "addr"        : "http://localhost:8202/",
-                     "path"        : "data/slave01.db",
-                     "server-port" : 8202
+        "slave"  : { "addr"         : "http://localhost:8202/",
+                     "path"         : "data/slave01.db",
+                     "journal-path" : "log/slave01.log",
+                     "server-port"  : 8202
                    }
     },
     "shard02": {
         "bucket-end" : 200,
-        "master" : { "addr"        : "http://localhost:8301/",
-                     "path"        : "data/master02.db",
-                     "server-port" : 8301
+        "master" : { "addr"         : "http://localhost:8301/",
+                     "path"         : "data/master02.db",
+                     "journal-path" : "log/master02.log",
+                     "server-port"  : 8301
                    },
-        "slave"  : { "addr"        : "http://localhost:8302/",
-                     "path"        : "data/slave02.db",
-                     "server-port" : 8302
+        "slave"  : { "addr"         : "http://localhost:8302/",
+                     "path"         : "data/slave02.db",
+                     "journal-path" : "log/slave02.log",
+                     "server-port"  : 8302
                    }
     },
 }

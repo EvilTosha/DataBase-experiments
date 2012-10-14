@@ -12,14 +12,19 @@
                              :error-msg (or error-msg "")
                              :data (or data "")))))
 
-(defun handle-db-request (action args)
+(defun handle-db-request (request-json)
   "Handle request from router, return json-encoded response"
-  (let (;; first arg isn't always key, but for now its true
-        (key (car args))
-        ;; parameters for response
-        error-flag
-        error-msg
-        data)
+  ;; store request to journal
+  (record-journal-entry request-json)
+  (let* ((parsed-request (json:parse request-json :object-as :hash-table))
+         (action (gethash "ACTION" parsed-request))
+         (args (gethash "ARGS" parsed-request))
+         ;; first arg isn't always key, but for now its true
+         (key (car args))
+         ;; parameters for response
+         error-flag
+         error-msg
+         data)
     (handler-case
         (setf data
               (cond
