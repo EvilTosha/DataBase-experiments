@@ -124,4 +124,4 @@
                          (make-instance 'db-entry
                                         :name (gethash "NAME" value)
                                         :phone (gethash "PHONE" value))))
-               database-temp)))))
+               database-temp))))

@@ -23,7 +23,7 @@
       ((string= "get" action)
        (if (not key)
            (error-message 'key-not-specified)
-           (shard-request key (make-request-json "retrieve" args) nil)))
+           (shard-request key (make-request-json "get" args) nil)))
       ((string= "update" action)
        (if (not key)
            (error-message 'key-not-specified)
@@ -31,7 +31,7 @@
       ((string= "remove" action)
        (if (not key)
            (error-message 'key-not-specified)
-           (shard-request key (make-request-json "delete" args) t)))
+           (shard-request key (make-request-json "remove" args) t)))
       (t (error-message 'unknown-command)))))
 
 (defun make-request-json (action args)
@@ -76,7 +76,11 @@ should be addressed to master"
             (setf result (%shard-request slave-url parameters :post))))
         ;; else, non-destructive operations
         ;; make get request to slave
-        (setf result (%shard-request slave-url parameters :get)))
+        (progn
+          (setf result (%shard-request slave-url parameters :get))
+          ;; if no content received, request master
+          (unless result
+            (setf result (%shard-request master-url parameters :get)))))
     (if result
         (render-shard-response result)
         ;; else something went wrong and we assume servers are down

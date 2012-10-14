@@ -15,7 +15,7 @@
 
 (defvar *server-info* (make-instance 'server-info))
 
-(defun start-server (server-name master-specifier &key dev)
+(defun start-server (server-name master-specifier)
   (declare (string server-name) (boolean master-specifier))
   ;;complete server info
   (setf (name *server-info*) server-name

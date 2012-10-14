@@ -13,7 +13,7 @@
 
 (defvar *server-info* (make-instance 'server-info))
 
-(defun start-server (server-name &key dev)
+(defun start-server (server-name)
   (declare (string server-name))
   ;; complete server-info
   (setf (name *server-info*) server-name
