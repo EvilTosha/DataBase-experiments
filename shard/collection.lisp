@@ -91,27 +91,37 @@
 
 ;;;; server-state operations (flush, load)
 
-(defun db-flush ()
+(defun db-flush (&optional (timestamp (last-update-time *server-info*)))
   "Saves current database state to disk"
-  (ensure-directories-exist "data/")
-  (with-open-file (file #P"data/snapshot.db"
-                        :direction :output :if-exists :supersede
-                        :if-does-not-exist :create)
-    (json:encode *database* file))
+  (declare (number timestamp))
+  (let ((path (config-get-my-option "path"))
+        (ht-for-serialize (make-hash-table :test #'equal)))
+    ;; store timestamp and collection to hash-table
+    (setf (gethash "TIME" ht-for-serialize) timestamp)
+    (setf (gethash "COLLECTION" ht-for-serialize) *database*)
+    (ensure-directories-exist path)
+    (with-open-file (file path
+                          :direction :output
+                          :if-exists :supersede
+                          :if-does-not-exist :create)
+      (json:encode ht-for-serialize file)))
   ;; return
   "Successfully saved data")
 
-(defun db-load (&optional (pathname #P"data/snapshot.db"))
+(defun db-load (&optional (path (pathname (config-get-my-option "path"))))
   "Restores saved database stage. Warning: all current data will be overwritten!"
-  (declare (pathname pathname))
-  (with-open-file (file pathname
-                        :direction :input :if-does-not-exist nil)
-    (let ((database-temp (json:parse (read-line file))))
+  (declare (pathname path))
+  (when (probe-file path)
+    (let* ((snapshot (json:parse (alexandria:read-file-into-string path) :object-as :hash-table))
+           (timestamp (gethash "TIME" snapshot))
+           (database-temp (gethash "COLLECTION" snapshot)))
       ;; FIXME: database shouldn't reset here
-      (setf *database* (make-hash-table :test #'equal))
+      (setf *database* (make-hash-table :test #'equal)
+            ;; update server's time
+            (last-update-time *server-info*) timestamp)
       (maphash #'(lambda (key value)
                    (setf (gethash key *database*)
                          (make-instance 'db-entry
                                         :name (gethash "NAME" value)
                                         :phone (gethash "PHONE" value))))
-               database-temp))))
+               database-temp)))))

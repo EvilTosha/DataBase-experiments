@@ -45,6 +45,7 @@ export action
 export servername
 export masterspecifier
 export swankport
+export LANG="ru_RU.UTF-8"
 
 #screen -dmS database-web-console
 sbcl --lose-on-corruption --disable-ldb --load start.lisp

@@ -10,7 +10,8 @@
    (port              :initarg :port             :initform 0                     :accessor port)
    (type              :initarg :type             :initform "shard")
    (master-specifier  :initarg :master-specifier :initform nil                   :accessor master-p)
-   (start-time        :initarg :start-time       :initform (get-universal-time)  :accessor start-time)))
+   (start-time        :initarg :start-time       :initform (get-universal-time)  :accessor start-time)
+   (last-update-time  :initarg :last-update-time :initform (get-universal-time)  :accessor last-update-time)))
 
 (defvar *server-info* (make-instance 'server-info))
 
