@@ -14,8 +14,6 @@
 
 (defun handle-db-request (request-json)
   "Handle request from router, return json-encoded response"
-  ;; store request to journal
-  (record-journal-entry request-json)
   (let* ((parsed-request (json:parse request-json :object-as :hash-table))
          (action (gethash "ACTION" parsed-request))
          (args (gethash "ARGS" parsed-request))
@@ -52,7 +50,9 @@
                      (or (string= "create" action)
                          (string= "update" action)
                          (string= "remove" action)))
-            (replicate-request request-json)))
+            (replicate-request request-json :syncronized t)
+            ;; store request to journal
+            (record-journal-entry request-json)))
       ;; handle occured error
       (error (e)
         (setf error-flag t

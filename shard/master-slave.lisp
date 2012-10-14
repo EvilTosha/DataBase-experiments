@@ -23,7 +23,7 @@
   "Sends copy of request to slave, if SYNCRONIZED parameter specified, returns whether
 replication has succed"
   (declare (string request-json) (boolean syncronized))
-  (let ((url (get-my-slave))
+  (let ((url (puri:merge-uris "/query" (get-my-slave)))
         (parameters `(("request" . ,request-json))))
     (if syncronized
         (%syncronized-request url parameters)
