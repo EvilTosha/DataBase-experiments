@@ -21,6 +21,13 @@
   (setf (name *server-info*) server-name
         (port *server-info*) (config-get-server-option server-name "server-port" master-specifier)
         (master-p *server-info*) master-specifier)
+
+  ;; load and update collection
+  (db-load)
+  (mapcar #'(lambda (journal-entry)
+              (handle-db-request journal-entry))
+          (request-journal-since-timestamp (last-update-time *server-info*)))
+
   ;; start hunchentoot server
   (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
                                     :port (port *server-info*)))

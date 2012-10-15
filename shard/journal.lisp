@@ -40,11 +40,11 @@
 
 (defun %request-journal-since-timestamp (url timestamp)
   "Do request to specified url, return list of json-encoded records \(same format as GET-RECORDS-SINCE-TIMESTAMP)"
-  (declare (string url) (number timestamp))
+  (declare (number timestamp))
   (ignore-errors ; ignore errors during connection, assuming server's down
     (multiple-value-bind (content code)
         ;; method is always :post as we're only replicationg destructive operations
-        (drakma:http-request url :method :get :parameters `("timestamp" . ,timestamp))
+        (drakma:http-request url :method :get :parameters `(("timestamp" . ,(format nil "~D" timestamp))))
       ;; return whether request was successful
       (when (equal code 200)
         (json:parse content)))))

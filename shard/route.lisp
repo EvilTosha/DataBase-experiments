@@ -46,11 +46,14 @@
                     ((string= "flush" action)
                      (db-flush))
                     (t (error (error-message 'unknown-command)))))
-          (when (and (master-p *server-info*)
-                     (or (string= "create" action)
-                         (string= "update" action)
-                         (string= "remove" action)))
-            (replicate-request request-json :syncronized t)
+          ;; if next code is evaluated, no error occured so far
+          (when (or (string= "create" action)
+                    (string= "update" action)
+                    (string= "remove" action))
+            (setf (last-update-time *server-info*) (get-universal-time))
+            ;; replicate request to slave
+            (when (master-p *server-info*)
+              (replicate-request request-json :syncronized t))
             ;; store request to journal
             (record-journal-entry request-json)))
       ;; handle occured error
