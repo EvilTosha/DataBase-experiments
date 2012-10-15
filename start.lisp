@@ -51,11 +51,10 @@
 (cond
   ((string= "start-router" *db-action*)
    (let ((package (find-package :router)))
-     (funcall (intern (symbol-name 'config-load) package))
-     (funcall (intern (symbol-name 'start-server) package) *server-name*)))
+     (funcall (intern (symbol-name 'config-load) package))                              ; load config
+     (funcall (intern (symbol-name 'start-server) package) *server-name*)))             ; start server
   ((string= "start-shard" *db-action*)
    (let ((package (find-package :shard)))
-     (funcall (intern (symbol-name 'config-load) package))
-     (funcall (intern (symbol-name 'start-server) package) *server-name* *master-p*)
-     (funcall (intern (symbol-name 'db-load) package))))
+     (funcall (intern (symbol-name 'config-load) package))                              ; load config
+     (funcall (intern (symbol-name 'start-server) package) *server-name* *master-p*)))  ; start server
   (t (error "Unknown action ~A" *db-action*)))

@@ -6,12 +6,9 @@
 (defun config-load (&optional (conf-path #P"config.json"))
   "Load data from config file to *config* variable"
   (declare (pathname conf-path))
-  ;; parse file contents
-  (with-open-file (file conf-path :direction :input)
-    (let* ((len (file-length file))
-           (conf-string (make-string len)))
-      (read-sequence conf-string file)
-      (setf *config* (json:parse conf-string :object-as :hash-table)))))
+  (when (probe-file conf-path)
+    (setf *config* (json:parse (alexandria:read-file-into-string conf-path)
+                               :object-as :hash-table))))
 
 (defun config-get-server-option (server-name option &optional (master nil master-specified-p))
   "By given server name, option and master-specifier returns value of this option in config;
@@ -45,4 +42,5 @@ Note: for correct work, *server-info* variable should be correctly set up"
       ;; FIXME: Maybe add some option to distinct router from shards?
       :when (string/= "router" server-name)
       :collect (cons (gethash "bucket-end" params) server-name))
-   #'< :key #'car))
+   #'<
+   :key #'car))

@@ -97,8 +97,8 @@
   (let ((path (config-get-my-option "path"))
         (ht-for-serialize (make-hash-table :test #'equal)))
     ;; store timestamp and collection to hash-table
-    (setf (gethash "TIME" ht-for-serialize) timestamp)
-    (setf (gethash "COLLECTION" ht-for-serialize) *database*)
+    (setf (gethash "TIME" ht-for-serialize) timestamp
+          (gethash "COLLECTION" ht-for-serialize) *database*)
     (ensure-directories-exist path)
     (with-open-file (file path
                           :direction :output

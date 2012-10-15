@@ -41,7 +41,7 @@
     (json:encode-plist (list :action action :args args))))
 
 (defun bucket-upper-bound (&optional (buckets *bucket-ends*))
-  "Finds maximal value of bucket end; used for hashing"
+  "Finds maximal value of bucket end; using for hashing"
   ;; assuming that alist contain growing values
   (caar (last buckets)))
 
