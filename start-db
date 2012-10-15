@@ -3,7 +3,7 @@
 function usage
 {
     echo "Usage: start-db [options] <action> ..."
-    echo "Actions:"
+    echo "Actions: start-router, start-shard, stop-router, stop-shard"
 }
 
 dev=
@@ -29,7 +29,17 @@ while [ "$1" != "" ]; do
                                 shift
                                 masterspecifier=$1
                                 ;;
+        stop-shard )            action="stop-shard"
+                                shift
+                                servername=$1
+                                shift
+                                masterspecifier=$1
+                                ;;
         start-router )          action="start-router"
+                                shift
+                                servername=$1
+                                ;;
+        stop-router )           action="stop-router"
                                 shift
                                 servername=$1
                                 ;;
@@ -47,5 +57,19 @@ export masterspecifier
 export swankport
 export LANG="ru_RU.UTF-8"
 
-#screen -dmS database-web-console
-sbcl --lose-on-corruption --disable-ldb --load start.lisp
+
+case "$action" in
+    "start-shard" )
+        screen -dmS "database-$servername-$masterspecifier" sbcl --lose-on-corruption --disable-ldb --load start.lisp
+        ;;
+    "start-router" )
+        screen -dmS "database-$servername" sbcl --lose-on-corruption --disable-ldb --load start.lisp
+        ;;
+    "stop-router" )
+        screen -S "database-$servername" -X quit
+        ;;
+    "stop-shard" )
+        screen -S "database-$servername-$masterspecifier" -X quit
+        ;;
+    * ) ;;
+esac
