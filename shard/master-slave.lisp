@@ -10,7 +10,11 @@
   "Returns url of slave corresponding to current server"
   (config-get-server-option (name *server-info*) "addr" nil))
 
-(defun %syncronized-request (url parameters)
+(defun get-my-master ()
+  "Returns url of master corresponding to current server"
+  (config-get-server-option (name *server-info*) "addr" t))
+
+(defun %syncronized-replicate-request (url parameters)
   (ignore-errors ; ignore errors during connection, assuming server's down
     (multiple-value-bind (content code)
         ;; method is always :post as we're only replicationg destructive operations
@@ -26,8 +30,8 @@ replication has succed"
   (let ((url (puri:merge-uris "/query" (get-my-slave)))
         (parameters `(("request" . ,request-json))))
     (if syncronized
-        (%syncronized-request url parameters)
+        (%syncronized-replicate-request url parameters)
         ;; else, start in different thread and return t
         (progn
-          (bt:make-thread #'(lambda () (%syncronized-request url parameters)))
+          (bt:make-thread #'(lambda () (%syncronized-replicate-request url parameters)))
           t))))
