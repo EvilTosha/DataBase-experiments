@@ -49,8 +49,7 @@
   "Returns name of server where specified key is stored"
   (declare (string key))
   (let ((in-ring-hash
-         ;; (nth-value 1 (floor a b)) is similar to (a % b) in C++/Java
-         (nth-value 1 (floor (sxhash key) (bucket-upper-bound *bucket-ends*)))))
+         (mod (sxhash key) (bucket-upper-bound *bucket-ends*))))
     (loop :for (end . server-name) :in *bucket-ends*
           :when (> end in-ring-hash)
           ;; yes, its return in lisp. But here it's the easiest way to finish
